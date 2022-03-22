@@ -1,22 +1,21 @@
 import React from "react";
-import type { NextPage } from "next";
+import { NextPage } from "next";
+import { Button } from "@chakra-ui/react";
 
 import { supabase } from "../utils/supabaseClient";
+import { useSession } from "../hooks/useSession";
 
 import Auth from "../components/Auth";
+import Dashboard from "../components/Dashboard";
 
 const Home: NextPage = () => {
-  const [session, setSession] = React.useState(null);
+  const session = useSession();
 
-  React.useEffect(() => {
-    setSession(supabase.auth.session());
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+  };
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
-  return <div>{session ? <div>Loggedin in</div> : <Auth />}</div>;
+  return <div>{session ? <Dashboard /> : <Auth />}</div>;
 };
 
 export default Home;
