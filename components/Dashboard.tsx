@@ -1,5 +1,15 @@
 import React from "react";
-import { Box, Button, Grid, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Grid,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from "@chakra-ui/react";
+import { ChevronDown, LogOut, Settings } from "react-feather";
 
 import { supabase } from "../utils/supabaseClient";
 import { useSession } from "../hooks/useSession";
@@ -14,8 +24,22 @@ const Dashboard = () => {
   return (
     <Grid gridTemplateColumns="320px 1fr" minHeight="100vh">
       <Box backgroundColor="#2c323d">
-        <Text>{session?.user?.email}</Text>
-        <Button onClick={handleSignOut}>Log out</Button>
+        <Menu>
+          <MenuButton
+            as={Button}
+            borderRadius="0"
+            width={"100%"}
+            rightIcon={<ChevronDown size={16} />}
+          >
+            {session?.user?.email}
+          </MenuButton>
+          <MenuList>
+            <MenuItem icon={<Settings size={16} />}>Settings</MenuItem>
+            <MenuItem onClick={handleSignOut} icon={<LogOut size={16} />}>
+              Log out
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </Box>
       <Box>Bookmarks</Box>
     </Grid>
