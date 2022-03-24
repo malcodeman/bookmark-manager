@@ -35,14 +35,12 @@ const Auth = () => {
   const [isSubmited, setIsSubmited] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleOnSubmit = async () => {
+  const handleOnSubmit = async (values: { email: string }) => {
     try {
       setIsLoading(true);
-      const resp = await supabase.auth.signIn({
-        email: "malcodeman@gmail.com",
-      });
-      if (resp.error) {
-        throw resp.error;
+      const { error } = await supabase.auth.signIn(values);
+      if (error) {
+        throw error;
       }
       setIsSubmited(true);
     } catch (er) {
@@ -70,7 +68,7 @@ const Auth = () => {
                 </FormHelperText>
               </FormControl>
               <Button type="submit" isFullWidth isLoading={isLoading}>
-                Login
+                Sign in
               </Button>
             </form>
           )}

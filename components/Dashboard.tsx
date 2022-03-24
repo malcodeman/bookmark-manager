@@ -7,12 +7,13 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Text,
 } from "@chakra-ui/react";
 import { ChevronDown, LogOut, Settings } from "react-feather";
 
 import { supabase } from "../utils/supabaseClient";
 import { useSession } from "../hooks/useSession";
+
+import Account from "./Account";
 
 const Dashboard = () => {
   const session = useSession();
@@ -41,7 +42,10 @@ const Dashboard = () => {
           </MenuList>
         </Menu>
       </Box>
-      <Box>Bookmarks</Box>
+      <Box>
+        Bookmarks
+        <Account />
+      </Box>
     </Grid>
   );
 };
