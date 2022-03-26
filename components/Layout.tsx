@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { ChevronDown, Folder, LogOut, Plus, Settings } from "react-feather";
 import { map, equals } from "ramda";
@@ -33,26 +34,28 @@ const Layout = (props: Props) => {
   const [collections, setCollections] = React.useState<Collection[]>([]);
   const router = useRouter();
   const id = router.query.id;
+  const toast = useToast();
 
   React.useEffect(() => {
     getCollections();
   }, [session]);
 
   const getCollections = async () => {
-    try {
-      const user = supabase.auth.user();
-      const { data, error, status } = await supabase
-        .from("collections")
-        .select(`id, name`)
-        .eq("user_id", user?.id);
-
-      if (error && status !== 406) {
-        throw error;
-      }
-      if (data) {
-        setCollections(data);
-      }
-    } catch (error) {}
+    const user = supabase.auth.user();
+    const { data, error } = await supabase
+      .from("collections")
+      .select(`id, name`)
+      .eq("user_id", user?.id);
+    if (error) {
+      toast({
+        title: `${error.message}`,
+        status: "error",
+        isClosable: true,
+      });
+    }
+    if (data) {
+      setCollections(data);
+    }
   };
 
   const handleSignOut = async () => {
@@ -66,8 +69,17 @@ const Layout = (props: Props) => {
       .from("collections")
       .insert([{ user_id: user?.id, name: "Untitled" }])
       .single();
-    setCollections([...collections, data]);
-    router.push(`/${data.id}`);
+    if (error) {
+      toast({
+        title: `${error.message}`,
+        status: "error",
+        isClosable: true,
+      });
+    }
+    if (data) {
+      setCollections([...collections, data]);
+      router.push(`/${data.id}`);
+    }
   };
 
   return (
