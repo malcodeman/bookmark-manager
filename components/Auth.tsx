@@ -62,12 +62,17 @@ const Auth = () => {
             <form onSubmit={form.handleSubmit(handleOnSubmit)}>
               <FormControl mb="4">
                 <FormLabel htmlFor="email">Email</FormLabel>
-                <Input {...form.register("email")} />
+                <Input {...form.register("email")} data-cy="email-input" />
                 <FormHelperText>
                   {form.formState.errors.email?.message}
                 </FormHelperText>
               </FormControl>
-              <Button type="submit" isFullWidth isLoading={isLoading}>
+              <Button
+                type="submit"
+                isFullWidth
+                isLoading={isLoading}
+                data-cy="cta-button"
+              >
                 Sign in
               </Button>
             </form>
