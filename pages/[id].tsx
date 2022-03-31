@@ -10,7 +10,7 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { Bookmark } from "react-feather";
+import { Bookmark, Trash2 } from "react-feather";
 import { map } from "ramda";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -31,7 +31,7 @@ const schema = yup
 
 const Collection: NextPage = () => {
   const router = useRouter();
-  const id = router.query.id;
+  const collectionId = router.query.id;
   const [links, setLinks] = React.useState<Link[]>([]);
   const toast = useToast();
   const form = useForm({
@@ -40,12 +40,12 @@ const Collection: NextPage = () => {
   });
 
   React.useEffect(() => {
-    if (id) {
-      getLinks();
+    if (collectionId) {
+      getLinks(Number(collectionId));
     }
-  }, [id]);
+  }, [collectionId]);
 
-  const getLinks = async () => {
+  const getLinks = async (id: number) => {
     const { data, error } = await supabase
       .from("links")
       .select(`id, link`)
@@ -63,11 +63,11 @@ const Collection: NextPage = () => {
   };
 
   const handleOnSubmit = async (data: { url: string }) => {
-    handleAddLink(data.url);
+    handleAddLink(Number(collectionId), data.url);
     form.reset();
   };
 
-  const handleAddLink = async (link: string) => {
+  const handleAddLink = async (id: number, link: string) => {
     const { data, error } = await supabase
       .from("links")
       .insert([{ collection_id: Number(id), link }])
@@ -84,9 +84,35 @@ const Collection: NextPage = () => {
     }
   };
 
+  const handleDeleteCollection = async (id: number) => {
+    await supabase.from("links").delete().eq("collection_id", id);
+    const { data, error } = await supabase
+      .from("collections")
+      .delete()
+      .eq("id", id);
+    if (error) {
+      toast({
+        title: `${error.message}`,
+        status: "error",
+        isClosable: true,
+      });
+    }
+    if (data) {
+      router.push("/");
+    }
+  };
+
   return (
     <div>
-      <div>Collection {id}</div>
+      <div>
+        Collection {collectionId}{" "}
+        <Button
+          leftIcon={<Trash2 size={16} />}
+          onClick={() => handleDeleteCollection(Number(collectionId))}
+        >
+          Delete
+        </Button>
+      </div>
       {map(
         (item) => (
           <Text key={item.id}>{item.link}</Text>
