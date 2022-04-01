@@ -3,12 +3,12 @@ import { NextPage } from "next";
 
 import { useSession } from "../hooks/useSession";
 
-import Auth from "../components/Auth";
+import Signup from "../components/Signup";
 import Dashboard from "../components/Dashboard";
 
 const Home: NextPage = () => {
   const session = useSession();
-  return <div>{session ? <Dashboard /> : <Auth />}</div>;
+  return <div>{session ? <Dashboard /> : <Signup />}</div>;
 };
 
 export default Home;
