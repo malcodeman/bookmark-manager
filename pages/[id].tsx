@@ -17,6 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import { supabase } from "../utils/supabaseClient";
+import useCollections from "../data/useCollections";
 
 type Link = {
   id: number;
@@ -38,6 +39,7 @@ const Collection: NextPage = () => {
     defaultValues: { url: "" },
     resolver: yupResolver(schema),
   });
+  const { deleteCollection } = useCollections();
 
   React.useEffect(() => {
     if (collectionId) {
@@ -85,19 +87,15 @@ const Collection: NextPage = () => {
   };
 
   const handleDeleteCollection = async (id: number) => {
-    await supabase.from("links").delete().eq("collection_id", id);
-    const { data, error } = await supabase
-      .from("collections")
-      .delete()
-      .eq("id", id);
-    if (error) {
+    const resp = await deleteCollection(id);
+    if (resp.error) {
       toast({
-        title: `${error.message}`,
+        title: `${resp.error.message}`,
         status: "error",
         isClosable: true,
       });
     }
-    if (data) {
+    if (resp.data) {
       router.push("/");
     }
   };

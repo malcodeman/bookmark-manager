@@ -4,7 +4,6 @@ import {
   Button,
   Flex,
   Grid,
-  Icon,
   Menu,
   MenuButton,
   MenuItem,
@@ -19,11 +18,8 @@ import { useRouter } from "next/router";
 
 import { supabase } from "../utils/supabaseClient";
 import { useSession } from "../hooks/useSession";
+import useCollections from "../data/useCollections";
 
-type Collection = {
-  id: number;
-  name: string;
-};
 type Props = {
   children: React.ReactNode;
 };
@@ -31,21 +27,12 @@ type Props = {
 const Layout = (props: Props) => {
   const { children } = props;
   const session = useSession();
-  const [collections, setCollections] = React.useState<Collection[]>([]);
   const router = useRouter();
   const id = router.query.id;
   const toast = useToast();
+  const { collections, error, insertCollection } = useCollections();
 
   React.useEffect(() => {
-    getCollections();
-  }, [session]);
-
-  const getCollections = async () => {
-    const user = supabase.auth.user();
-    const { data, error } = await supabase
-      .from("collections")
-      .select(`id, name`)
-      .eq("user_id", user?.id);
     if (error) {
       toast({
         title: `${error.message}`,
@@ -53,10 +40,7 @@ const Layout = (props: Props) => {
         isClosable: true,
       });
     }
-    if (data) {
-      setCollections(data);
-    }
-  };
+  }, [error]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -64,21 +48,16 @@ const Layout = (props: Props) => {
   };
 
   const handleAddCollection = async () => {
-    const user = supabase.auth.user();
-    const { data, error } = await supabase
-      .from("collections")
-      .insert([{ user_id: user?.id, name: "Untitled" }])
-      .single();
-    if (error) {
+    const resp = await insertCollection();
+    if (resp.error) {
       toast({
-        title: `${error.message}`,
+        title: `${resp.error.message}`,
         status: "error",
         isClosable: true,
       });
     }
-    if (data) {
-      setCollections([...collections, data]);
-      router.push(`/${data.id}`);
+    if (resp.data) {
+      router.push(`/${resp.data.id}`);
     }
   };
 
