@@ -6,7 +6,26 @@ const useAuth = () => {
   const session = useSession();
 
   const signUp = async (values: { email: string; password: string }) => {
-    return await supabase.auth.signUp(values);
+    const taken = await supabase
+      .from("users")
+      .select("id, email")
+      .eq("email", values.email)
+      .single();
+    if (taken.data) {
+      return {
+        user: null,
+        session: null,
+        error: { message: "Email has already been taken" },
+      };
+    }
+    const resp = await supabase.auth.signUp(values);
+    if (resp.user?.email) {
+      await insertUser({
+        id: resp.user.id,
+        email: resp.user.email,
+      });
+    }
+    return resp;
   };
 
   const signIn = async (values: { email: string; password: string }) => {
