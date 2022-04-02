@@ -48,13 +48,13 @@ const Signup = () => {
   }) => {
     setIsLoading(true);
     const resp = await signUp(values);
+    setIsLoading(false);
     if (resp.user) {
       setIsSubmited(true);
     }
     if (resp.error) {
       form.setError("password", { message: resp.error.message });
     }
-    setIsLoading(false);
   };
 
   const handleSignIn = () => {

@@ -47,13 +47,13 @@ const Signin = () => {
   }) => {
     setIsLoading(true);
     const resp = await auth.signIn(values);
+    setIsLoading(false);
     if (resp.user) {
       router.push("/");
     }
     if (resp.error) {
       form.setError("password", { message: resp.error.message });
     }
-    setIsLoading(false);
   };
 
   const handleSignUp = () => {
