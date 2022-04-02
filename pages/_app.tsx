@@ -1,6 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { none, equals } from "ramda";
+import { SWRConfig } from "swr";
 import type { AppProps } from "next/app";
 
 import { PUBLIC_ROUTES } from "../lib/constants";
@@ -17,15 +18,23 @@ function MyApp({ Component, pageProps }: AppProps) {
     session && none((item) => equals(pathname, item), PUBLIC_ROUTES);
 
   return (
-    <ChakraProvider>
-      {isProtectedRoute ? (
-        <Layout>
+    <SWRConfig
+      value={{
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+      }}
+    >
+      <ChakraProvider>
+        {isProtectedRoute ? (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        ) : (
           <Component {...pageProps} />
-        </Layout>
-      ) : (
-        <Component {...pageProps} />
-      )}
-    </ChakraProvider>
+        )}
+      </ChakraProvider>
+    </SWRConfig>
   );
 }
 
