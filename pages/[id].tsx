@@ -16,13 +16,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { supabase } from "../utils/supabaseClient";
 import useCollections from "../data/useCollections";
-
-type Link = {
-  id: number;
-  link: string;
-};
+import useLinks from "../data/useLinks";
 
 const schema = yup
   .object({
@@ -33,25 +28,15 @@ const schema = yup
 const Collection: NextPage = () => {
   const router = useRouter();
   const collectionId = router.query.id;
-  const [links, setLinks] = React.useState<Link[]>([]);
   const toast = useToast();
   const form = useForm({
     defaultValues: { url: "" },
     resolver: yupResolver(schema),
   });
   const { deleteCollection } = useCollections();
+  const { links, error, insertLink } = useLinks(collectionId);
 
   React.useEffect(() => {
-    if (collectionId) {
-      getLinks(Number(collectionId));
-    }
-  }, [collectionId]);
-
-  const getLinks = async (id: number) => {
-    const { data, error } = await supabase
-      .from("links")
-      .select(`id, link`)
-      .eq("collection_id", id);
     if (error) {
       toast({
         title: `${error.message}`,
@@ -59,31 +44,18 @@ const Collection: NextPage = () => {
         isClosable: true,
       });
     }
-    if (data) {
-      setLinks(data);
-    }
-  };
+  }, [error]);
 
   const handleOnSubmit = async (data: { url: string }) => {
-    handleAddLink(Number(collectionId), data.url);
-    form.reset();
-  };
-
-  const handleAddLink = async (id: number, link: string) => {
-    const { data, error } = await supabase
-      .from("links")
-      .insert([{ collection_id: Number(id), link }])
-      .single();
-    if (error) {
+    const resp = await insertLink(data.url);
+    if (resp.error) {
       toast({
         title: `${error.message}`,
         status: "error",
         isClosable: true,
       });
     }
-    if (data) {
-      setLinks([...links, data]);
-    }
+    form.reset();
   };
 
   const handleDeleteCollection = async (id: number) => {

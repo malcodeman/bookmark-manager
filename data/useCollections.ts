@@ -18,7 +18,10 @@ const useCollections = (): {
   deleteCollection: (id: number) => Promise<PostgrestSingleResponse<any>>;
 } => {
   const session = useSession();
-  const { data, error } = useSWR("collections", () => getCollections());
+  const key = "/collections";
+  const { data, error } = useSWR(session?.user?.id ? key : null, () =>
+    getCollections()
+  );
   const { mutate } = useSWRConfig();
 
   const getCollections = async () => {
@@ -39,7 +42,7 @@ const useCollections = (): {
       .from("collections")
       .insert([{ user_id: session?.user?.id, name }])
       .single();
-    mutate("collections");
+    mutate(key);
     return resp;
   };
 
@@ -50,7 +53,7 @@ const useCollections = (): {
       .delete()
       .eq("id", id)
       .single();
-    mutate("collections");
+    mutate(key);
     return resp;
   };
 
