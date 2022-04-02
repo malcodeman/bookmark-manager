@@ -17,7 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/router";
 
-import { supabase } from "../utils/supabaseClient";
+import useAuth from "../data/useAuth";
 
 const schema = yup
   .object({
@@ -39,24 +39,71 @@ const Signin = () => {
   });
   const [isLoading, setIsLoading] = React.useState(false);
   const router = useRouter();
+  const auth = useAuth();
 
-  const handleOnSubmit = async (values: { email: string }) => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.signIn(values);
-      if (error) {
-        form.setError("password", { message: error.message });
-        throw error;
-      }
+  const handleOnSubmit = async (values: {
+    email: string;
+    password: string;
+  }) => {
+    setIsLoading(true);
+    const resp = await auth.signIn(values);
+    if (resp.user) {
       router.push("/");
-    } catch (er) {
-    } finally {
-      setIsLoading(false);
     }
+    if (resp.error) {
+      form.setError("password", { message: resp.error.message });
+    }
+    setIsLoading(false);
   };
 
   const handleSignUp = () => {
     router.push("/signup");
+  };
+
+  const renderMain = () => {
+    if (auth.session) {
+      return (
+        <Button isFullWidth onClick={() => router.push("/")}>
+          Go to dashboard
+        </Button>
+      );
+    }
+    return (
+      <Box>
+        <Box as="form" mb="20" onSubmit={form.handleSubmit(handleOnSubmit)}>
+          <FormControl mb="4">
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <Input {...form.register("email")} data-cy="email-input" />
+            <FormHelperText>
+              {form.formState.errors.email?.message}
+            </FormHelperText>
+          </FormControl>
+          <FormControl mb="4">
+            <FormLabel htmlFor="password">Password</FormLabel>
+            <Input
+              {...form.register("password")}
+              type="password"
+              data-cy="password-input"
+            />
+            <FormHelperText>
+              {form.formState.errors.password?.message}
+            </FormHelperText>
+          </FormControl>
+          <Button
+            type="submit"
+            isFullWidth
+            isLoading={isLoading}
+            data-cy="cta-button"
+          >
+            Sign in
+          </Button>
+        </Box>
+        <Text mb="2">Don't have an account??</Text>
+        <Button variant={"outline"} isFullWidth onClick={handleSignUp}>
+          Sign up
+        </Button>
+      </Box>
+    );
   };
 
   return (
@@ -65,40 +112,7 @@ const Signin = () => {
         <Heading fontSize="2xl">Bookmark manager</Heading>
       </Box>
       <Center padding="16">
-        <Container maxW="sm">
-          <Box as="form" mb="20" onSubmit={form.handleSubmit(handleOnSubmit)}>
-            <FormControl mb="4">
-              <FormLabel htmlFor="email">Email</FormLabel>
-              <Input {...form.register("email")} data-cy="email-input" />
-              <FormHelperText>
-                {form.formState.errors.email?.message}
-              </FormHelperText>
-            </FormControl>
-            <FormControl mb="4">
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <Input
-                {...form.register("password")}
-                type="password"
-                data-cy="password-input"
-              />
-              <FormHelperText>
-                {form.formState.errors.password?.message}
-              </FormHelperText>
-            </FormControl>
-            <Button
-              type="submit"
-              isFullWidth
-              isLoading={isLoading}
-              data-cy="cta-button"
-            >
-              Sign in
-            </Button>
-          </Box>
-          <Text mb="2">Don't have an account??</Text>
-          <Button variant={"outline"} isFullWidth onClick={handleSignUp}>
-            Sign up
-          </Button>
-        </Container>
+        <Container maxW="sm">{renderMain()}</Container>
       </Center>
     </Grid>
   );

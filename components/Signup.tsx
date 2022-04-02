@@ -17,7 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/router";
 
-import { supabase } from "../utils/supabaseClient";
+import useAuth from "../data/useAuth";
 
 const schema = yup
   .object({
@@ -40,27 +40,74 @@ const Signup = () => {
   const [isSubmited, setIsSubmited] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const router = useRouter();
+  const { session, signUp } = useAuth();
 
-  const handleOnSubmit = async (values: { email: string }) => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase.auth.signUp(values);
-      if (error) {
-        if (error) {
-          form.setError("password", { message: error.message });
-          throw error;
-        }
-        throw error;
-      }
+  const handleOnSubmit = async (values: {
+    email: string;
+    password: string;
+  }) => {
+    setIsLoading(true);
+    const resp = await signUp(values);
+    if (resp.user) {
       setIsSubmited(true);
-    } catch (er) {
-    } finally {
-      setIsLoading(false);
     }
+    if (resp.error) {
+      form.setError("password", { message: resp.error.message });
+    }
+    setIsLoading(false);
   };
 
   const handleSignIn = () => {
     router.push("/signin");
+  };
+
+  const renderMain = () => {
+    if (session) {
+      return (
+        <Button isFullWidth onClick={() => router.push("/")}>
+          Go to dashboard
+        </Button>
+      );
+    }
+    if (isSubmited) {
+      return <Text>Email sent.</Text>;
+    }
+    return (
+      <Box>
+        <Box as="form" mb="20" onSubmit={form.handleSubmit(handleOnSubmit)}>
+          <FormControl mb="4">
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <Input {...form.register("email")} data-cy="email-input" />
+            <FormHelperText>
+              {form.formState.errors.email?.message}
+            </FormHelperText>
+          </FormControl>
+          <FormControl mb="4">
+            <FormLabel htmlFor="password">Password</FormLabel>
+            <Input
+              {...form.register("password")}
+              type="password"
+              data-cy="password-input"
+            />
+            <FormHelperText>
+              {form.formState.errors.password?.message}
+            </FormHelperText>
+          </FormControl>
+          <Button
+            type="submit"
+            isFullWidth
+            isLoading={isLoading}
+            data-cy="cta-button"
+          >
+            Sign up
+          </Button>
+        </Box>
+        <Text mb="2">Already have an account?</Text>
+        <Button variant={"outline"} isFullWidth onClick={handleSignIn}>
+          Sign in
+        </Button>
+      </Box>
+    );
   };
 
   return (
@@ -69,50 +116,7 @@ const Signup = () => {
         <Heading fontSize="2xl">Bookmark manager</Heading>
       </Box>
       <Center padding="16">
-        <Container maxW="sm">
-          {isSubmited ? (
-            <Text>Email sent.</Text>
-          ) : (
-            <Box>
-              <Box
-                as="form"
-                mb="20"
-                onSubmit={form.handleSubmit(handleOnSubmit)}
-              >
-                <FormControl mb="4">
-                  <FormLabel htmlFor="email">Email</FormLabel>
-                  <Input {...form.register("email")} data-cy="email-input" />
-                  <FormHelperText>
-                    {form.formState.errors.email?.message}
-                  </FormHelperText>
-                </FormControl>
-                <FormControl mb="4">
-                  <FormLabel htmlFor="password">Password</FormLabel>
-                  <Input
-                    {...form.register("password")}
-                    type="password"
-                    data-cy="password-input"
-                  />
-                  <FormHelperText>
-                    {form.formState.errors.password?.message}
-                  </FormHelperText>
-                </FormControl>
-                <Button
-                  type="submit"
-                  isFullWidth
-                  isLoading={isLoading}
-                  data-cy="cta-button"
-                >
-                  Sign up
-                </Button>
-              </Box>
-              <Text mb="2">Already have an account?</Text>
-              <Button variant={"outline"} isFullWidth onClick={handleSignIn}>
-                Sign in
-              </Button>
-            </Box>
-          )}
-        </Container>
+        <Container maxW="sm">{renderMain()}</Container>
       </Center>
     </Grid>
   );
