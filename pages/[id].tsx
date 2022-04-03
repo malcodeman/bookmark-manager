@@ -2,39 +2,30 @@ import React from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import {
+  Box,
   Button,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Input,
+  Flex,
   Text,
+  useBoolean,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { Bookmark, Trash2 } from "react-feather";
+import { Plus, Trash2 } from "react-feather";
 import { map } from "ramda";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 
 import useCollections from "../data/useCollections";
 import useLinks from "../data/useLinks";
 
-const schema = yup
-  .object({
-    url: yup.string().required("URL is required.").url("URL need to be valid."),
-  })
-  .required();
+import InsertLinkModal from "../components/InsertLinkModal";
 
 const Collection: NextPage = () => {
   const router = useRouter();
   const collectionId = router.query.id;
   const toast = useToast();
-  const form = useForm({
-    defaultValues: { url: "" },
-    resolver: yupResolver(schema),
-  });
   const { deleteCollection } = useCollections();
   const { links, error, insertLink } = useLinks(collectionId);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoading, setisLoading] = useBoolean();
 
   React.useEffect(() => {
     if (error) {
@@ -47,15 +38,18 @@ const Collection: NextPage = () => {
   }, [error]);
 
   const handleOnSubmit = async (data: { url: string }) => {
+    setisLoading.on();
     const resp = await insertLink(data.url);
+    setisLoading.off();
     if (resp.error) {
       toast({
         title: `${error.message}`,
         status: "error",
         isClosable: true,
       });
+    } else {
+      onClose();
     }
-    form.reset();
   };
 
   const handleDeleteCollection = async (id: number) => {
@@ -74,31 +68,32 @@ const Collection: NextPage = () => {
 
   return (
     <div>
-      <div>
-        Collection {collectionId}{" "}
-        <Button
-          leftIcon={<Trash2 size={16} />}
-          onClick={() => handleDeleteCollection(Number(collectionId))}
-        >
-          Delete
+      <Flex justifyContent={"space-between"}>
+        <Box>
+          Collection {collectionId}{" "}
+          <Button
+            leftIcon={<Trash2 size={16} />}
+            onClick={() => handleDeleteCollection(Number(collectionId))}
+          >
+            Delete
+          </Button>
+        </Box>
+        <Button leftIcon={<Plus size={16} />} onClick={onOpen}>
+          Add link
         </Button>
-      </div>
+      </Flex>
       {map(
         (item) => (
           <Text key={item.id}>{item.link}</Text>
         ),
         links
       )}
-      <form onSubmit={form.handleSubmit(handleOnSubmit)}>
-        <FormControl>
-          <FormLabel htmlFor="url">URL</FormLabel>
-          <Input {...form.register("url")} />
-          <FormHelperText>{form.formState.errors.url?.message}</FormHelperText>
-        </FormControl>
-        <Button leftIcon={<Bookmark size={16} />} type="submit">
-          Save
-        </Button>
-      </form>
+      <InsertLinkModal
+        isOpen={isOpen}
+        isLoading={isLoading}
+        onClose={onClose}
+        onSubmit={handleOnSubmit}
+      />
     </div>
   );
 };
