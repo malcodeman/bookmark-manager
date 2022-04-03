@@ -25,7 +25,7 @@ const useLinks = (
   const getLinks = async () => {
     const resp = await supabase
       .from("links")
-      .select(`id, link`)
+      .select(`id, link, created_at`)
       .eq("collection_id", id);
     if (resp.error) {
       throw resp.error;

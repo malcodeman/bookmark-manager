@@ -11,12 +11,14 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { Plus, Trash2 } from "react-feather";
-import { map } from "ramda";
+import { Cell } from "react-table";
+import { formatDistanceToNow } from "date-fns";
 
 import useCollections from "../data/useCollections";
 import useLinks from "../data/useLinks";
 
 import InsertLinkModal from "../components/InsertLinkModal";
+import Table from "../components/Table";
 
 const Collection: NextPage = () => {
   const router = useRouter();
@@ -26,6 +28,26 @@ const Collection: NextPage = () => {
   const { links, error, insertLink } = useLinks(collectionId);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setisLoading] = useBoolean();
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "URL",
+        accessor: "link",
+      },
+      {
+        Header: "Created",
+        accessor: "created_at",
+        Cell: function scoreCell(props: Cell) {
+          return (
+            <Text>
+              {formatDistanceToNow(new Date(props.value), { addSuffix: true })}
+            </Text>
+          );
+        },
+      },
+    ],
+    []
+  );
 
   React.useEffect(() => {
     if (error) {
@@ -82,12 +104,7 @@ const Collection: NextPage = () => {
           Add link
         </Button>
       </Flex>
-      {map(
-        (item) => (
-          <Text key={item.id}>{item.link}</Text>
-        ),
-        links
-      )}
+      <Table columns={columns} data={links} />
       <InsertLinkModal
         isOpen={isOpen}
         isLoading={isLoading}
