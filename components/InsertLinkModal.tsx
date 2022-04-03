@@ -51,7 +51,7 @@ const InsertLinkModal = (props: Props) => {
         <ModalCloseButton />
         <ModalBody>
           <Box as="form" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormControl>
+            <FormControl mb="4">
               <FormLabel htmlFor="url">URL</FormLabel>
               <Input {...form.register("url")} />
               <FormHelperText>

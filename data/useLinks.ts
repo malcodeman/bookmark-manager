@@ -40,7 +40,13 @@ const useLinks = (
       .from("links")
       .insert([{ collection_id: id, link }])
       .single();
-    mutate(key);
+    mutate(
+      key,
+      (items: Link[]) => {
+        return [...items, resp.data];
+      },
+      { revalidate: false }
+    );
     return resp;
   };
 

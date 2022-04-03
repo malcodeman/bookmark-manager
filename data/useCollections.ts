@@ -1,5 +1,5 @@
 import useSWR, { useSWRConfig } from "swr";
-import { and } from "ramda";
+import { and, reject } from "ramda";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 import { useSession } from "../hooks/useSession";
@@ -42,7 +42,21 @@ const useCollections = (): {
       .from("collections")
       .insert([{ user_id: session?.user?.id, name }])
       .single();
-    mutate(key);
+    mutate(
+      key,
+      (items: Collection[]) => {
+        return [...items, resp.data];
+      },
+      { revalidate: false }
+    );
+    const linkId = `/collections${resp.data.id}/links`;
+    mutate(
+      linkId,
+      () => {
+        return [];
+      },
+      { revalidate: false }
+    );
     return resp;
   };
 
@@ -53,7 +67,13 @@ const useCollections = (): {
       .delete()
       .eq("id", id)
       .single();
-    mutate(key);
+    mutate(
+      key,
+      (items: Collection[]) => {
+        return reject((item: Collection) => item.id === resp.data.id, items);
+      },
+      { revalidate: false }
+    );
     return resp;
   };
 
