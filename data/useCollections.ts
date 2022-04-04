@@ -49,9 +49,15 @@ const useCollections = (): {
       },
       { revalidate: false }
     );
-    const linkId = `/collections${resp.data.id}/links`;
     mutate(
-      linkId,
+      `/collections/${resp.data.id}`,
+      () => {
+        return { name };
+      },
+      { revalidate: false }
+    );
+    mutate(
+      `/collections/${resp.data.id}/links`,
       () => {
         return [];
       },

@@ -18,7 +18,7 @@ const useLinks = (
   insertLink: (link: string) => Promise<PostgrestSingleResponse<any>>;
   deleteLink: (id: number) => Promise<PostgrestSingleResponse<any>>;
 } => {
-  const key = `/collections${id}/links`;
+  const key = `/collections/${id}/links`;
   const { data, error } = useSWR(id ? key : null, () => getLinks());
   const { mutate } = useSWRConfig();
 
