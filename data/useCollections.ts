@@ -28,7 +28,8 @@ const useCollections = (): {
     const resp = await supabase
       .from("collections")
       .select(`id, name`)
-      .eq("user_id", session?.user?.id);
+      .eq("user_id", session?.user?.id)
+      .order("id", { ascending: false });
     if (resp.error) {
       throw resp.error;
     }

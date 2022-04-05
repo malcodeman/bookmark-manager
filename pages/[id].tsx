@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Flex,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -14,9 +15,10 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { ChevronDown, Plus, Trash2 } from "react-feather";
+import { ChevronDown, Edit2, Plus, Trash2 } from "react-feather";
 import { Cell } from "react-table";
 import { formatDistanceToNow } from "date-fns";
+import { useForm } from "react-hook-form";
 
 import useCollections from "../data/useCollections";
 import useLinks from "../data/useLinks";
@@ -25,15 +27,29 @@ import useCollection from "../data/useCollection";
 import InsertLinkModal from "../components/InsertLinkModal";
 import Table from "../components/Table";
 
+const NameEditable = (props: {
+  name: string;
+  onSubmit: (values: { name: string }) => void;
+}) => {
+  const { name, onSubmit } = props;
+  const form = useForm({ defaultValues: { name } });
+  return (
+    <Box as="form" onSubmit={form.handleSubmit(onSubmit)}>
+      <Input size="sm" {...form.register("name")} />
+    </Box>
+  );
+};
+
 const Collection: NextPage = () => {
   const router = useRouter();
   const collectionId = router.query.id;
   const toast = useToast();
   const { deleteCollection } = useCollections();
   const { links, error, insertLink } = useLinks(collectionId);
-  const { collection } = useCollection(collectionId);
+  const { collection, updateCollection } = useCollection(collectionId);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setisLoading] = useBoolean();
+  const [isEditable, setIsEditable] = useBoolean();
   const columns = React.useMemo(
     () => [
       {
@@ -54,6 +70,10 @@ const Collection: NextPage = () => {
     ],
     []
   );
+
+  React.useEffect(() => {
+    setIsEditable.off();
+  }, [collectionId]);
 
   React.useEffect(() => {
     if (error) {
@@ -94,21 +114,42 @@ const Collection: NextPage = () => {
     }
   };
 
+  const handleRenameCollection = () => {
+    setIsEditable.on();
+  };
+
+  const handleEditableOnSubmit = async (values: { name: string }) => {
+    await updateCollection(values);
+    setIsEditable.off();
+  };
+
   return (
     <Box padding="4">
       <Flex mb="8" justifyContent={"space-between"}>
         <Box>
           <Menu>
-            <MenuButton>
-              <Button
+            {isEditable ? (
+              <NameEditable
+                name={collection.name}
+                onSubmit={handleEditableOnSubmit}
+              />
+            ) : (
+              <MenuButton
+                as={Button}
                 variant={"ghost"}
                 rightIcon={<ChevronDown size={16} />}
                 size="sm"
               >
                 {collection.name}
-              </Button>
-            </MenuButton>
+              </MenuButton>
+            )}
             <MenuList>
+              <MenuItem
+                icon={<Edit2 size={16} />}
+                onClick={handleRenameCollection}
+              >
+                Rename
+              </MenuItem>
               <MenuItem
                 icon={<Trash2 size={16} />}
                 onClick={() => handleDeleteCollection(Number(collectionId))}
