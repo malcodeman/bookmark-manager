@@ -45,8 +45,12 @@ const Collection: NextPage = () => {
   const collectionId = router.query.id;
   const toast = useToast();
   const { deleteCollection } = useCollections();
-  const { links, error, insertLink } = useLinks(collectionId);
-  const { collection, updateCollection } = useCollection(collectionId);
+  const { links, error: linksError, insertLink } = useLinks(collectionId);
+  const {
+    collection,
+    error: collectionError,
+    updateCollection,
+  } = useCollection(collectionId);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setisLoading] = useBoolean();
   const [isEditable, setIsEditable] = useBoolean();
@@ -76,14 +80,25 @@ const Collection: NextPage = () => {
   }, [collectionId]);
 
   React.useEffect(() => {
-    if (error) {
+    if (linksError) {
       toast({
-        title: `${error.message}`,
+        title: `${linksError.message}`,
         status: "error",
         isClosable: true,
       });
     }
-  }, [error]);
+  }, [linksError]);
+
+  React.useEffect(() => {
+    if (collectionError) {
+      toast({
+        title: `${collectionError.message}`,
+        status: "error",
+        isClosable: true,
+      });
+      router.push("/");
+    }
+  }, [collectionError]);
 
   const handleOnSubmit = async (data: { url: string }) => {
     setisLoading.on();
@@ -91,7 +106,7 @@ const Collection: NextPage = () => {
     setisLoading.off();
     if (resp.error) {
       toast({
-        title: `${error.message}`,
+        title: `${resp.error.message}`,
         status: "error",
         isClosable: true,
       });
