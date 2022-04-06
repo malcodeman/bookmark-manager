@@ -1,5 +1,5 @@
 import useSWR, { useSWRConfig } from "swr";
-import { and } from "ramda";
+import { and, map } from "ramda";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 import { supabase } from "../utils/supabaseClient";
@@ -44,6 +44,21 @@ const useCollection = (
       key,
       (current: Collection) => {
         return { ...current, ...values };
+      },
+      { revalidate: false }
+    );
+    mutate(
+      "/collections",
+      (current: Collection[]) => {
+        return map((item) => {
+          if (item.id === Number(id)) {
+            return {
+              ...item,
+              ...values,
+            };
+          }
+          return item;
+        }, current);
       },
       { revalidate: false }
     );
