@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import {
   Box,
   Button,
+  Center,
   Flex,
   Input,
   Menu,
@@ -19,6 +20,7 @@ import { ChevronDown, Edit2, Plus, Trash2 } from "react-feather";
 import { Cell } from "react-table";
 import { formatDistanceToNow } from "date-fns";
 import { useForm } from "react-hook-form";
+import { length } from "ramda";
 
 import useCollections from "../data/useCollections";
 import useLinks from "../data/useLinks";
@@ -178,7 +180,13 @@ const Collection: NextPage = () => {
           Add link
         </Button>
       </Flex>
-      <Table columns={columns} data={links} />
+      {length(links) === 0 ? (
+        <Center>
+          <Text>No links added yet</Text>
+        </Center>
+      ) : (
+        <Table columns={columns} data={links} />
+      )}
       <InsertLinkModal
         isOpen={isOpen}
         isLoading={isLoading}
