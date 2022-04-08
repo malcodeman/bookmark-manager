@@ -36,6 +36,8 @@ const InsertLinkModal = (props: Props) => {
     defaultValues: { url: "" },
     resolver: yupResolver(schema),
   });
+  const initialFocusRef = React.useRef<HTMLInputElement | null>(null);
+  const { ref, ...rest } = form.register("url");
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -44,7 +46,7 @@ const InsertLinkModal = (props: Props) => {
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} initialFocusRef={initialFocusRef} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Add link</ModalHeader>
@@ -53,7 +55,13 @@ const InsertLinkModal = (props: Props) => {
           <Box as="form" onSubmit={form.handleSubmit(onSubmit)}>
             <FormControl mb="4">
               <FormLabel htmlFor="url">URL</FormLabel>
-              <Input {...form.register("url")} />
+              <Input
+                {...rest}
+                ref={(e) => {
+                  ref(e);
+                  initialFocusRef.current = e;
+                }}
+              />
               <FormHelperText>
                 {form.formState.errors.url?.message}
               </FormHelperText>
