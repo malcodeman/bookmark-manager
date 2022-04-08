@@ -21,6 +21,7 @@ import { Cell } from "react-table";
 import { formatDistanceToNow } from "date-fns";
 import { useForm } from "react-hook-form";
 import { length } from "ramda";
+import * as yup from "yup";
 
 import useCollections from "../data/useCollections";
 import useLinks from "../data/useLinks";
@@ -41,6 +42,12 @@ const NameEditable = (props: {
     </Box>
   );
 };
+
+const schema = yup
+  .object({
+    url: yup.string().required().url(),
+  })
+  .required();
 
 const Collection: NextPage = () => {
   const router = useRouter();
@@ -140,6 +147,16 @@ const Collection: NextPage = () => {
     setIsEditable.off();
   };
 
+  const handleAddLink = async () => {
+    try {
+      const url = await navigator.clipboard.readText();
+      await schema.validate({ url });
+      handleOnSubmit({ url });
+    } catch {
+      onOpen();
+    }
+  };
+
   return (
     <Box padding="4">
       <Flex mb="8" justifyContent={"space-between"}>
@@ -176,7 +193,7 @@ const Collection: NextPage = () => {
             </MenuList>
           </Menu>
         </Box>
-        <Button size="sm" leftIcon={<Plus size={16} />} onClick={onOpen}>
+        <Button size="sm" leftIcon={<Plus size={16} />} onClick={handleAddLink}>
           Add link
         </Button>
       </Flex>
