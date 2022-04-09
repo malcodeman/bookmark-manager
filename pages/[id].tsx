@@ -5,8 +5,10 @@ import {
   Box,
   Button,
   Center,
+  Editable,
+  EditableInput,
+  EditablePreview,
   Flex,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -19,7 +21,6 @@ import {
 import { ChevronDown, Edit2, Plus, Trash2 } from "react-feather";
 import { Cell } from "react-table";
 import { formatDistanceToNow } from "date-fns";
-import { useForm } from "react-hook-form";
 import { length } from "ramda";
 import * as yup from "yup";
 
@@ -29,19 +30,6 @@ import useCollection from "../data/useCollection";
 
 import InsertLinkModal from "../components/InsertLinkModal";
 import Table from "../components/Table";
-
-const NameEditable = (props: {
-  name: string;
-  onSubmit: (values: { name: string }) => void;
-}) => {
-  const { name, onSubmit } = props;
-  const form = useForm({ defaultValues: { name } });
-  return (
-    <Box as="form" onSubmit={form.handleSubmit(onSubmit)}>
-      <Input size="sm" {...form.register("name")} />
-    </Box>
-  );
-};
 
 const schema = yup
   .object({
@@ -142,8 +130,8 @@ const Collection: NextPage = () => {
     setIsEditable.on();
   };
 
-  const handleEditableOnSubmit = async (values: { name: string }) => {
-    await updateCollection(values);
+  const handleEditableOnSubmit = async (nextValue: string) => {
+    await updateCollection({ name: nextValue });
     setIsEditable.off();
   };
 
@@ -163,10 +151,14 @@ const Collection: NextPage = () => {
         <Box>
           <Menu>
             {isEditable ? (
-              <NameEditable
-                name={collection.name}
+              <Editable
+                startWithEditView
+                defaultValue={collection.name}
                 onSubmit={handleEditableOnSubmit}
-              />
+              >
+                <EditablePreview />
+                <EditableInput />
+              </Editable>
             ) : (
               <MenuButton
                 as={Button}
