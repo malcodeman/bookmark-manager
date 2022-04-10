@@ -42,7 +42,12 @@ const Collection: NextPage = () => {
   const collectionId = router.query.id;
   const toast = useToast();
   const { deleteCollection } = useCollections();
-  const { links, error: linksError, insertLink } = useLinks(collectionId);
+  const {
+    links,
+    error: linksError,
+    insertLink,
+    deleteLink,
+  } = useLinks(collectionId);
   const {
     collection,
     error: collectionError,
@@ -65,6 +70,20 @@ const Collection: NextPage = () => {
             <Text>
               {formatDistanceToNow(new Date(props.value), { addSuffix: true })}
             </Text>
+          );
+        },
+      },
+      {
+        accessor: "id",
+        Cell: function idCell(props: Cell) {
+          return (
+            <Button
+              size="sm"
+              leftIcon={<Trash2 size={16} />}
+              onClick={() => handleDeleteLink(props.value)}
+            >
+              Delete
+            </Button>
           );
         },
       },
@@ -96,6 +115,17 @@ const Collection: NextPage = () => {
       router.push("/");
     }
   }, [collectionError]);
+
+  const handleDeleteLink = async (id: number) => {
+    const resp = await deleteLink(id);
+    if (resp.error) {
+      toast({
+        title: `${resp.error.message}`,
+        status: "error",
+        isClosable: true,
+      });
+    }
+  };
 
   const handleOnSubmit = async (data: { url: string }) => {
     setisLoading.on();
