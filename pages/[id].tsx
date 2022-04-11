@@ -152,6 +152,11 @@ const Collection: NextPage = () => {
       });
     }
     if (resp.data) {
+      toast({
+        title: `Collection deleted.`,
+        status: "info",
+        isClosable: true,
+      });
       router.push("/");
     }
   };
