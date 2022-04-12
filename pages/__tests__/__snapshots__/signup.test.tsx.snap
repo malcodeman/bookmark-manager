@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders Signup unchanged 1`] = `
+<div>
+  <div
+    class="css-1hq12dw"
+  >
+    <div
+      class="css-en2fmr"
+    >
+      <h2
+        class="chakra-heading css-1n49pl7"
+      >
+        Bookmark manager
+      </h2>
+    </div>
+    <div
+      class="css-1vh6nji"
+    >
+      <div
+        class="chakra-container css-1ms27t5"
+      >
+        <div
+          class="css-0"
+        >
+          <form
+            class="css-uewl2b"
+          >
+            <div
+              class="chakra-form-control css-1itv5e3"
+              role="group"
+            >
+              <label
+                class="chakra-form__label css-uvho5g"
+                for="email"
+                id="field-1-label"
+              >
+                Email
+              </label>
+              <input
+                aria-describedby="field-1-helptext"
+                class="chakra-input css-0"
+                data-cy="email-input"
+                id="field-1"
+                name="email"
+              />
+              <div
+                class="chakra-form__helper-text css-0"
+                id="field-1-helptext"
+              />
+            </div>
+            <div
+              class="chakra-form-control css-1itv5e3"
+              role="group"
+            >
+              <label
+                class="chakra-form__label css-uvho5g"
+                for="password"
+                id="field-2-label"
+              >
+                Password
+              </label>
+              <input
+                aria-describedby="field-2-helptext"
+                class="chakra-input css-0"
+                data-cy="password-input"
+                id="field-2"
+                name="password"
+                type="password"
+              />
+              <div
+                class="chakra-form__helper-text css-0"
+                id="field-2-helptext"
+              />
+            </div>
+            <button
+              class="chakra-button css-uxt1e8"
+              data-cy="cta-button"
+              type="submit"
+            >
+              Sign up
+            </button>
+          </form>
+          <p
+            class="chakra-text css-wlea3r"
+          >
+            Already have an account?
+          </p>
+          <button
+            class="chakra-button css-uxt1e8"
+            type="button"
+          >
+            Sign in
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
