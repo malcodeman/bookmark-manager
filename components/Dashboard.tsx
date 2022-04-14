@@ -18,6 +18,11 @@ const Dashboard = () => {
       });
     }
     if (resp.data) {
+      toast({
+        title: `Collection created.`,
+        status: "info",
+        isClosable: true,
+      });
       router.push(`/${resp.data.id}`);
     }
   };
