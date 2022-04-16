@@ -98,7 +98,7 @@ const Signin = () => {
             Sign in
           </Button>
         </Box>
-        <Text mb="2">Don't have an account??</Text>
+        <Text mb="2">Don&apos;t have an account??</Text>
         <Button variant={"outline"} isFullWidth onClick={handleSignUp}>
           Sign up
         </Button>
