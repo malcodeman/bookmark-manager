@@ -40,7 +40,7 @@ const Layout = (props: Props) => {
         isClosable: true,
       });
     }
-  }, [error]);
+  }, [error, toast]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -87,7 +87,7 @@ const Layout = (props: Props) => {
           </Flex>
           {map(
             (item) => (
-              <Link key={item.id} href={`/${item.id}`}>
+              <Link key={item.id} href={`/${item.id}`} passHref>
                 <Button
                   leftIcon={<Folder size={16} />}
                   variant={"ghost"}

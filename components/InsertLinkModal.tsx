@@ -43,7 +43,7 @@ const InsertLinkModal = (props: Props) => {
     if (!isOpen) {
       form.reset();
     }
-  }, [isOpen]);
+  }, [form, isOpen]);
 
   return (
     <Modal isOpen={isOpen} initialFocusRef={initialFocusRef} onClose={onClose}>

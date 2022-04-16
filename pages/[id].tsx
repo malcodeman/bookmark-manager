@@ -56,18 +56,6 @@ const Collection: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setisLoading] = useBoolean();
   const [isEditable, setIsEditable] = useBoolean();
-
-  const handleDeleteLink = async (id: number) => {
-    const resp = await deleteLink(id);
-    if (resp.error) {
-      toast({
-        title: `${resp.error.message}`,
-        status: "error",
-        isClosable: true,
-      });
-    }
-  };
-
   const columns = React.useMemo(
     () => [
       {
@@ -88,6 +76,16 @@ const Collection: NextPage = () => {
       {
         accessor: "id",
         Cell: function idCell(props: Cell) {
+          const handleDeleteLink = async (id: number) => {
+            const resp = await deleteLink(id);
+            if (resp.error) {
+              toast({
+                title: `${resp.error.message}`,
+                status: "error",
+                isClosable: true,
+              });
+            }
+          };
           return (
             <Button
               size="sm"
@@ -100,12 +98,8 @@ const Collection: NextPage = () => {
         },
       },
     ],
-    [handleDeleteLink]
+    [deleteLink, toast]
   );
-
-  React.useEffect(() => {
-    setIsEditable.off();
-  }, [collectionId]);
 
   React.useEffect(() => {
     if (linksError) {
@@ -126,7 +120,7 @@ const Collection: NextPage = () => {
       });
       router.push("/");
     }
-  }, [collectionError, toast]);
+  }, [collectionError, router, toast]);
 
   const handleOnSubmit = async (data: { url: string }) => {
     setisLoading.on();
