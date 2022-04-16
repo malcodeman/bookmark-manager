@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 
-import CollectionDetails from "../[id]";
+import CollectionDetails from "../pages/[id]";
 
 jest.mock("next/router", () => ({
   useRouter() {
