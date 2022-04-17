@@ -9,6 +9,7 @@ import {
   MenuItem,
   MenuList,
   Text,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown, Folder, LogOut, Plus, Settings } from "react-feather";
@@ -19,6 +20,7 @@ import { useRouter } from "next/router";
 import { supabase } from "../utils/supabaseClient";
 import { useSession } from "../hooks/useSession";
 import useCollections from "../data/useCollections";
+import AccountModal from "./AccountModal";
 
 type Props = {
   children: React.ReactNode;
@@ -31,6 +33,7 @@ const Layout = (props: Props) => {
   const id = router.query.id;
   const toast = useToast();
   const { collections, error, insertCollection } = useCollections();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   React.useEffect(() => {
     if (error) {
@@ -74,7 +77,9 @@ const Layout = (props: Props) => {
             {session?.user?.email}
           </MenuButton>
           <MenuList>
-            <MenuItem icon={<Settings size={16} />}>Settings</MenuItem>
+            <MenuItem onClick={onOpen} icon={<Settings size={16} />}>
+              Settings
+            </MenuItem>
             <MenuItem onClick={handleSignOut} icon={<LogOut size={16} />}>
               Log out
             </MenuItem>
@@ -107,6 +112,7 @@ const Layout = (props: Props) => {
         </Box>
       </Box>
       <Box>{children}</Box>
+      <AccountModal isOpen={isOpen} onClose={onClose} />
     </Grid>
   );
 };
