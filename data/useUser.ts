@@ -1,4 +1,4 @@
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { and } from "ramda";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
@@ -22,8 +22,7 @@ const useUser = (): {
   const session = useSession();
   const id = session?.user?.id;
   const key = `/users/${id}`;
-  const { data, error } = useSWR(id ? key : null, () => getUser());
-  const { mutate } = useSWRConfig();
+  const { data, error, mutate } = useSWR(id ? key : null, () => getUser());
 
   const getUser = async () => {
     const resp = await supabase
@@ -42,7 +41,6 @@ const useUser = (): {
   const updateUser = async (values: { name?: string }) => {
     const resp = await supabase.from("users").update(values).eq("id", id);
     mutate(
-      key,
       (current: User) => {
         return { ...current, ...values };
       },
