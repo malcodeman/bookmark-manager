@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 import useAuth from "../data/useAuth";
 
@@ -54,10 +55,6 @@ const Signin = () => {
     if (resp.error) {
       form.setError("password", { message: resp.error.message });
     }
-  };
-
-  const handleSignUp = () => {
-    router.push("/signup");
   };
 
   const renderMain = () => {
@@ -99,9 +96,11 @@ const Signin = () => {
           </Button>
         </Box>
         <Text mb="2">Don&apos;t have an account??</Text>
-        <Button variant={"outline"} isFullWidth onClick={handleSignUp}>
-          Sign up
-        </Button>
+        <Link href="/signup" passHref>
+          <Button variant={"outline"} isFullWidth>
+            Sign up
+          </Button>
+        </Link>
       </Box>
     );
   };
