@@ -106,11 +106,15 @@ const Signin = () => {
   };
 
   return (
-    <Grid gridTemplateColumns="320px 1fr" minHeight="100vh">
-      <Box padding="16" backgroundColor="#2c323d">
+    <Grid gridTemplateColumns={["1fr", "1fr", "320px 1fr"]} minHeight="100vh">
+      <Box
+        display={["none", "none", "block"]}
+        padding="16"
+        backgroundColor="#2c323d"
+      >
         <Heading fontSize="2xl">Bookmark manager</Heading>
       </Box>
-      <Center padding="16">
+      <Center padding={["4", "8", "16"]}>
         <Container maxW="sm">{renderMain()}</Container>
       </Center>
     </Grid>
