@@ -13,6 +13,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Spinner,
   Text,
   useBoolean,
   useDisclosure,
@@ -21,7 +22,7 @@ import {
 import { ChevronDown, Edit2, Plus, Trash2 } from "react-feather";
 import { Cell } from "react-table";
 import { formatDistanceToNow } from "date-fns";
-import { length } from "ramda";
+import { equals, length } from "ramda";
 import * as yup from "yup";
 
 import useCollections from "../data/useCollections";
@@ -49,6 +50,7 @@ const Collection: NextPage = () => {
     deleteLink,
   } = useLinks(collectionId);
   const {
+    isLoading: isLoadingCollection,
     collection,
     error: collectionError,
     updateCollection,
@@ -175,6 +177,24 @@ const Collection: NextPage = () => {
     }
   };
 
+  const renderMain = () => {
+    if (isLoadingCollection) {
+      return (
+        <Center>
+          <Spinner />
+        </Center>
+      );
+    }
+    if (equals(length(links), 0)) {
+      return (
+        <Center>
+          <Text>No links added yet</Text>
+        </Center>
+      );
+    }
+    return <Table columns={columns} data={links} />;
+  };
+
   return (
     <Box padding="4">
       <Flex mb="8" justifyContent={"space-between"}>
@@ -219,13 +239,7 @@ const Collection: NextPage = () => {
           Add link
         </Button>
       </Flex>
-      {length(links) === 0 ? (
-        <Center>
-          <Text>No links added yet</Text>
-        </Center>
-      ) : (
-        <Table columns={columns} data={links} />
-      )}
+      {renderMain()}
       <InsertLinkModal
         isOpen={isOpen}
         isLoading={isLoading}
