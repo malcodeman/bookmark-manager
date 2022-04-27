@@ -18,7 +18,9 @@ const useAuth = () => {
         error: { message: "Email has already been taken" },
       };
     }
-    const resp = await supabase.auth.signUp(values);
+    const resp = await supabase.auth.signUp(values, {
+      redirectTo: window.location.origin,
+    });
     if (resp.user?.email) {
       await insertUser({
         id: resp.user.id,
@@ -29,7 +31,9 @@ const useAuth = () => {
   };
 
   const signIn = async (values: { email: string; password: string }) => {
-    return await supabase.auth.signIn(values);
+    return await supabase.auth.signIn(values, {
+      redirectTo: window.location.origin,
+    });
   };
 
   const insertUser = async (values: { id: string; email: string }) => {
