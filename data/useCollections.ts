@@ -29,7 +29,7 @@ const useCollections = (): {
       .from("collections")
       .select(`id, name`)
       .eq("user_id", session?.user?.id)
-      .order("id", { ascending: false });
+      .order("id", { ascending: true });
     if (resp.error) {
       throw resp.error;
     }

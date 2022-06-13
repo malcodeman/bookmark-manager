@@ -13,6 +13,7 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { isEmpty } from "ramda";
 
 import useUser from "../data/useUser";
 
@@ -29,7 +30,7 @@ const AccountModal = (props: Props) => {
   const { user, updateUser } = useUser();
 
   React.useEffect(() => {
-    if (user) {
+    if (!isEmpty(user)) {
       form.reset(user);
     }
   }, [form, user]);
