@@ -126,6 +126,14 @@ const Collection: NextPage = () => {
   }, [collectionError, router, toast]);
 
   useKeyboardEvent("n", onOpen, [], { event: "keyup" });
+  useKeyboardEvent(
+    "Delete",
+    () => {
+      handleDeleteCollection(Number(collectionId));
+    },
+    [],
+    { event: "keyup" }
+  );
 
   const handleOnSubmit = async (data: { url: string }) => {
     setisLoading.on();

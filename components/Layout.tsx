@@ -13,9 +13,10 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown, Folder, LogOut, Plus, Settings } from "react-feather";
-import { map, equals } from "ramda";
+import { map, equals, type, dec } from "ramda";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useKeyboardEvent } from "@react-hookz/web";
 
 import { supabase } from "../utils/supabaseClient";
 import { useSession } from "../hooks/useSession";
@@ -35,21 +36,6 @@ const Layout = (props: Props) => {
   const { collections, error, insertCollection } = useCollections();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  React.useEffect(() => {
-    if (error) {
-      toast({
-        title: `${error.message}`,
-        status: "error",
-        isClosable: true,
-      });
-    }
-  }, [error, toast]);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
   const handleAddCollection = async () => {
     const resp = await insertCollection();
     if (resp.error) {
@@ -62,6 +48,37 @@ const Layout = (props: Props) => {
     if (resp.data) {
       router.push(`/${resp.data.id}`);
     }
+  };
+
+  React.useEffect(() => {
+    if (error) {
+      toast({
+        title: `${error.message}`,
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }, [error, toast]);
+
+  useKeyboardEvent(
+    true,
+    (ev) => {
+      const key = Number(ev.key);
+      if (type(key) === "Number") {
+        const col = collections[dec(key)];
+        if (col) {
+          router.push(`/${col.id}`);
+        }
+      }
+    },
+    [],
+    { eventOptions: { passive: true } }
+  );
+  useKeyboardEvent("c", handleAddCollection, [], { event: "keyup" });
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
   };
 
   return (
