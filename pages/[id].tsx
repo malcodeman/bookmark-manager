@@ -24,6 +24,7 @@ import { Cell } from "react-table";
 import { formatDistanceToNow } from "date-fns";
 import { equals, length } from "ramda";
 import * as yup from "yup";
+import { useKeyboardEvent } from "@react-hookz/web";
 
 import useCollections from "../data/useCollections";
 import useLinks from "../data/useLinks";
@@ -123,6 +124,8 @@ const Collection: NextPage = () => {
       router.push("/");
     }
   }, [collectionError, router, toast]);
+
+  useKeyboardEvent("n", onOpen, [], { event: "keyup" });
 
   const handleOnSubmit = async (data: { url: string }) => {
     setisLoading.on();
