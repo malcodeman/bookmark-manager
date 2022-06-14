@@ -88,6 +88,13 @@ const Collection: NextPage = () => {
                 isClosable: true,
               });
             }
+            if (resp.data) {
+              toast({
+                title: `Link deleted.`,
+                status: "info",
+                isClosable: true,
+              });
+            }
           };
           return (
             <Button
